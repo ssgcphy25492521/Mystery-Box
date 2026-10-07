@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎁 免費幸運盲盒 🎁</title>
-    <!-- 引入 Canvas-Confetti 絲帶特效庫 -->
-    <script src="https://jsdelivr.net"></script>
+    <!-- 修正：引入正確的 Canvas-Confetti CDN 網址 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     
     <style>
         /* 基礎網頁樣式設定 */
@@ -66,8 +66,7 @@
             100% { transform: translate(2px, -3px) rotate(0deg); }
         }
         .shaking {
-            animation: shake 1s;
-            animation-iteration-count: 3;
+            animation: shake 1s infinite;
             pointer-events: none;
         }
         /* 開盒按鈕樣式 */
@@ -121,11 +120,9 @@
     <!-- 結果顯示 -->
     <div id="result"></div>
 
-    <!-- 音效資源（此處使用免版權的線上公共音效網址，你也可以換成自己的 MP3 檔案） -->
-    <!-- 搖晃音效 (鼓點/緊張感) -->
-    <audio id="shakeSound" src="https://mixkit.co" preload="auto"></audio>
-    <!-- 中獎音效 (叮噹/慶祝) -->
-    <audio id="winSound" src="https://mixkit.co" preload="auto"></audio>
+    <!-- 修正：更新為可直接測試的示範音效檔（可替換為本地 .mp3 檔） -->
+    <audio id="shakeSound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3" preload="auto"></audio>
 
     <script>
         // 【自訂獎品與中獎機率】
@@ -155,12 +152,12 @@
             btn.innerText = "抽獎中...";
             btn.disabled = true;
 
-            // 🎵 播放搖晃音效 (重複播放以填滿 3 秒)
+            // 🎵 播放搖晃音效
             shakeSound.currentTime = 0;
             shakeSound.loop = true;
-            shakeSound.play().catch(e => console.log("瀏覽器阻擋了自動播放，需等待使用者互動。"));
+            shakeSound.play().catch(e => console.log("瀏覽器阻擋自動播放，需用戶互動。"));
 
-            // 核心等待計時器：3000毫秒 = 3秒鐘
+            // 核心等待計時器：3秒鐘
             setTimeout(() => {
                 // 停止搖晃動畫與搖晃音效
                 box.classList.remove('shaking');
@@ -169,21 +166,19 @@
 
                 // 🎵 播放中獎慶祝音效
                 winSound.currentTime = 0;
-                winSound.play();
+                winSound.play().catch(e => console.log("音效播放失敗"));
 
-                // 🎉 觸發絲帶/彩帶噴發特效 (從左下角與右下角一齊噴出)
+                // 🎉 觸發絲帶/彩帶噴發特效
                 const duration = 1.5 * 1000;
                 const end = Date.now() + duration;
 
                 (function frame() {
-                    // 左側噴出
                     confetti({
                         particleCount: 3,
                         angle: 60,
                         spread: 55,
                         origin: { x: 0, y: 0.8 }
                     });
-                    // 右側噴出
                     confetti({
                         particleCount: 3,
                         angle: 120,
@@ -220,7 +215,7 @@
             }, 3000);
         }
 
-        // 綁定點擊盲盒方塊也能觸發抽獎
+        // 綁定點擊盲盒方塊觸發抽獎
         document.getElementById('boxContainer').addEventListener('click', openBox);
     </script>
 </body>
