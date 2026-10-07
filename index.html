@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 免費幸運盲盒 🎁</title>
+    <style>
+        /* 基礎網頁樣式設定 */
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            text-align: center; 
+            background: #f0f2f5; 
+            padding-top: 50px; 
+            margin: 0;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* 盲盒容器與正方形盒子 */
+        .box-container { 
+            margin: 20px auto; 
+            width: 200px; 
+            height: 200px; 
+            cursor: pointer; 
+            position: relative; 
+        }
+
+        .box { 
+            width: 100%; 
+            height: 100%; 
+            background: #ff4757; 
+            border-radius: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-size: 40px; 
+            font-weight: bold; 
+            box-shadow: 0 12px 25px rgba(255, 71, 87, 0.4); 
+            transition: transform 0.2s, box-shadow 0.2s; 
+        }
+
+        .box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 71, 87, 0.5);
+        }
+
+        /* CSS 劇烈搖晃動畫（配合 3 秒等待） */
+        @keyframes shake {
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            10% { transform: translate(-2px, -3px) rotate(-1.5deg); }
+            20% { transform: translate(-4px, 0px) rotate(1.5deg); }
+            30% { transform: translate(0px, 3px) rotate(0deg); }
+            40% { transform: translate(2px, -2px) rotate(1.5deg); }
+            50% { transform: translate(-2px, 3px) rotate(-1.5deg); }
+            60% { transform: translate(-4px, 2px) rotate(0deg); }
+            70% { transform: translate(3px, 2px) rotate(-1.5deg); }
+            80% { transform: translate(-2px, -2px) rotate(1.5deg); }
+            90% { transform: translate(3px, 3px) rotate(0deg); }
+            100% { transform: translate(2px, -3px) rotate(0deg); }
+        }
+
+        /* 設定動畫時間為 1 秒，重覆 3 次，剛好 3 秒鐘 */
+        .shaking { 
+            animation: shake 1s; 
+            animation-iteration-count: 3; 
+            pointer-events: none; /* 搖晃期間禁止重覆點擊 */
+        }
+
+        /* 開盒按鈕樣式 */
+        .btn { 
+            padding: 12px 35px; 
+            font-size: 18px; 
+            font-weight: bold;
+            background: #2ed573; 
+            color: white; 
+            border: none; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            margin-top: 25px; 
+            box-shadow: 0 5px 15px rgba(46, 213, 115, 0.3);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background: #26af5f;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 抽獎結果文字顯示區 */
+        #result { 
+            margin-top: 40px; 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #ff4757; 
+            min-height: 40px; 
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎁 幸運盲盒抽獎 🎁</h1>
+    <div class="subtitle">點擊方塊或下方按鈕，心誠則靈！</div>
+
+    <!-- 盲盒主體 -->
+    <div class="box-container" id="boxContainer">
+        <div class="box" id="blindBox">？</div>
+    </div>
+
+    <!-- 控制按鈕 -->
+    <button class="btn" id="drawBtn" onclick="openBox()">隨機開盒</button>
+    
+    <!-- 結果顯示 -->
+    <div id="result"></div>
+
+    <script>
+        // 【自訂獎品與中獎機率】
+        // weight 數值越高代表越容易抽中。例如以下總權重為 5 + 15 + 30 + 50 = 100
+        // SSR 的機率就是 5/100 = 5% 
+        const prizes = [
+            { name: "✨ 終極隱藏大獎 (SSR) ✨", weight: 5 },
+            { name: "🧸 精美公仔 (SR)", weight: 15 },
+            { name: "🔑 精美鎖匙扣 (R)", weight: 30 },
+            { name: "🍬 安慰獎：珍寶珠一粒", weight: 50 }
+        ];
+
+        let isDrawing = false;
+
+        function openBox() {
+            // 如果正在抽獎中，直接攔截，防止重覆觸發
+            if (isDrawing) return;
+            isDrawing = true;
+            
+            const box = document.getElementById('blindBox');
+            const resultDiv = document.getElementById('result');
+            const btn = document.getElementById('drawBtn');
+            
+            // 初始化狀態
+            resultDiv.innerText = "正在開盒中，請稍候...";
+            resultDiv.style.color = "#7f8c8d";
+            box.classList.add('shaking'); 
+            btn.innerText = "抽獎中...";
+            btn.style.background = "#aaaaaa";
+
+            // 核心等待計時器：3000毫秒 = 3秒鐘
+            setTimeout(() => {
+                // 移除搖晃動畫
+                box.classList.remove('shaking');
+                
+                // 執行權重隨機算法
+                const totalWeight = prizes.reduce((sum, p) => sum + p.weight, 0);
+                let randomNum = Math.random() * totalWeight;
+                let drawnPrize = null;
+
+                for (const prize of prizes) {
+                    if (randomNum < prize.weight) {
+                        drawnPrize = prize;
+                        break;
+                    }
+                    randomNum -= prize.weight;
+                }
+
+                // 在網頁上渲染中獎結果
+                resultDiv.innerText = `恭喜你抽中：${drawnPrize.name}`;
+                resultDiv.style.color = "#ff4757"; // 變回驚喜的紅色
+                
+                // 還原按鈕狀態
+                btn.innerText = "隨機開盒";
+                btn.style.background = "#2ed573";
+                isDrawing = false;
+            }, 3000); 
+        }
+
+        // 綁定點擊盲盒方塊也能觸發抽獎
+        document.getElementById('boxContainer').addEventListener('click', openBox);
+    </script>
+</body>
+</html>
