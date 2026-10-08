@@ -245,148 +245,150 @@
    <div id="result"></div>
 
 <script>
-   const prizes = [
-       { image: "S1.png", weight: 30 },
-       { image: "S2.png", weight: 5 },
-       { image: "S3.png", weight: 5 },
-       { image: "S4.png", weight: 5 },
-       { image: "S5.png", weight: 55 }
-   ];
+    const prizes = [
+        { image: "S1.png", weight: 30 },
+        { image: "S2.png", weight: 5 },
+        { image: "S3.png", weight: 5 },
+        { image: "S4.png", weight: 5 },
+        { image: "S5.png", weight: 55 }
+    ];
+
+    // Preload all prize images immediately to eliminate image swapping flicker
+    prizes.forEach(prize => {
+        const img = new Image();
+        img.src = prize.image;
+    });
  
-   let isDrawing = false;
-   let isOpen = false; // Tracks if the box is currently open
-   let audioCtx; 
+    let isDrawing = false;
+    let isOpen = false;
+    let audioCtx; 
     
-   const box = document.getElementById('blindBox');
-   const closeBtn = document.getElementById('closeBtn');
-   const resultDiv = document.getElementById('result');
-   const prizePopup = document.getElementById('prizePopup');
-   const popupImg = document.getElementById('popupImg');
+    const box = document.getElementById('blindBox');
+    const closeBtn = document.getElementById('closeBtn');
+    const resultDiv = document.getElementById('result');
+    const prizePopup = document.getElementById('prizePopup');
+    const popupImg = document.getElementById('popupImg');
 
-   // Initialize the audio engine
-   function initAudio() {
-       if (!audioCtx) {
-           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-       }
-       if (audioCtx.state === 'suspended') {
-           audioCtx.resume();
-       }
-   }
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
 
-   // Synthesize a retro "rattling/shaking" sound
-   function playShakeSound() {
-       initAudio();
-       for (let i = 0; i < 12; i++) {
-           const osc = audioCtx.createOscillator();
-           const gain = audioCtx.createGain();
-           osc.connect(gain);
-           gain.connect(audioCtx.destination);
-           
-           osc.type = 'square'; 
-           osc.frequency.value = 80 + (Math.random() * 40); 
-           
-           const startTime = audioCtx.currentTime + (i * 0.1);
-           gain.gain.setValueAtTime(0.05, startTime);
-           gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.08);
-           
-           osc.start(startTime);
-           osc.stop(startTime + 0.1);
-       }
-   }
+    function playShakeSound() {
+        initAudio();
+        for (let i = 0; i < 12; i++) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'square'; 
+            osc.frequency.value = 80 + (Math.random() * 40); 
+            
+            const startTime = audioCtx.currentTime + (i * 0.1);
+            gain.gain.setValueAtTime(0.05, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.08);
+            
+            osc.start(startTime);
+            osc.stop(startTime + 0.1);
+        }
+    }
 
-   // Synthesize an ascending "Tada!" chord
-   function playWinSound() {
-       initAudio();
-       const notes = [261.63, 329.63, 392.00, 523.25];
-       const now = audioCtx.currentTime;
-       
-       notes.forEach((freq, i) => {
-           const osc = audioCtx.createOscillator();
-           const gain = audioCtx.createGain();
-           osc.connect(gain);
-           gain.connect(audioCtx.destination);
-           
-           osc.type = 'sine';
-           osc.frequency.value = freq;
-           
-           const startTime = now + (i * 0.1); 
-           gain.gain.setValueAtTime(0, startTime);
-           gain.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
-           
-           const duration = (i === notes.length - 1) ? 1.5 : 0.2; 
-           gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-           
-           osc.start(startTime);
-           osc.stop(startTime + duration);
-       });
-   }
- 
-   function openBox() {
-       // Prevent clicking if it's already shaking OR already open
-       if (isDrawing || isOpen) return;
-       isDrawing = true;
-       
-       resultDiv.style.color = "#2b6cb0"; 
-       resultDiv.innerHTML = "抽獎中... Opening...";
-       
-       box.classList.add('shaking');
-       playShakeSound();
- 
-       const wonPrize = drawPrize();
- 
-       setTimeout(() => {
-           popupImg.src = wonPrize.image;
-       }, 400);
- 
-       setTimeout(() => {
-           box.classList.remove('shaking');
-           showResult(wonPrize);
-       }, 1200); 
+    function playWinSound() {
+        initAudio();
+        const notes = [261.63, 329.63, 392.00, 523.25];
+        const now = audioCtx.currentTime;
+        
+        notes.forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            
+            const startTime = now + (i * 0.1); 
+            gain.gain.setValueAtTime(0, startTime);
+            gain.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
+            
+            const duration = (i === notes.length - 1) ? 1.5 : 0.2; 
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        });
     }
  
-   function drawPrize() {
-       const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
-       let randomNum = Math.random() * totalWeight;
-       
-       for (let prize of prizes) {
-           if (randomNum < prize.weight) {
+    function openBox() {
+        if (isDrawing || isOpen) return;
+        isDrawing = true;
+        
+        resultDiv.style.color = "#2b6cb0"; 
+        resultDiv.innerHTML = "抽獎中... Opening...";
+        
+        box.classList.add('shaking');
+        playShakeSound();
+
+        const wonPrize = drawPrize();
+
+        // Assign new image immediately while hidden so it is ready before popup opens
+        popupImg.src = wonPrize.image;
+
+        setTimeout(() => {
+            box.classList.remove('shaking');
+            showResult(wonPrize);
+        }, 1200); 
+    }
+ 
+    function drawPrize() {
+        const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
+        let randomNum = Math.random() * totalWeight;
+        
+        for (let prize of prizes) {
+            if (randomNum < prize.weight) {
                 return prize;
-           }
-           randomNum -= prize.weight;
-       }
-       return prizes[prizes.length - 1]; 
+            }
+            randomNum -= prize.weight;
+        }
+        return prizes[prizes.length - 1]; 
     }
  
-   function showResult(prize) {
-       playWinSound();
+    function showResult(prize) {
+        playWinSound();
 
-       confetti({
-           particleCount: 150,
-           spread: 80,
-           origin: { y: 0.6 },
-           colors: ['#1a365d', '#2b6cb0', '#f6ad55', '#e2e8f0']
-       });
-       
-       prizePopup.classList.add('active');
+        confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { y: 0.6 },
+            colors: ['#1a365d', '#2b6cb0', '#f6ad55', '#e2e8f0']
+        });
+        
+        prizePopup.classList.add('active');
  
-       resultDiv.style.color = "#e53e3e";
-       resultDiv.innerHTML = `🎉 恭喜獲得 Congratulations! 🎉`;
-       
-       isDrawing = false;
-       isOpen = true; // Mark the box as open
-       closeBtn.style.display = 'inline-block'; // Show the close button
+        resultDiv.style.color = "#e53e3e";
+        resultDiv.innerHTML = `🎉 恭喜獲得 Congratulations! 🎉`;
+        
+        isDrawing = false;
+        isOpen = true;
+        closeBtn.style.display = 'inline-block';
     }
-// Function to close the box and reset for the next player
+
     function closeBox() {
-       prizePopup.classList.remove('active');
-       closeBtn.style.display = 'none'; 
-       resultDiv.innerHTML = ""; // Clears the congratulations text immediately
-       
-       // Brief delay before allowing another click so the shrink animation finishes
-       setTimeout(() => {
-           isOpen = false; 
-       }, 300);
-   }
+        prizePopup.classList.remove('active');
+        closeBtn.style.display = 'none'; 
+        resultDiv.innerHTML = "";
+        
+        // Clear image source after shrink animation finishes
+        setTimeout(() => {
+            isOpen = false; 
+            popupImg.src = "";
+        }, 300);
+    }
 </script>
 </body>
 </html>
