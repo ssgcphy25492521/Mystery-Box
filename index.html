@@ -118,7 +118,7 @@
             box-shadow: 0 20px 35px rgba(30, 60, 114, 0.5);
         }
 
-        /* 盲盒內封面圖片 (取代問號) */
+        /* 盲盒內封面圖片 */
         .box-logo {
             max-width: 100%;
             max-height: 100%;
@@ -154,3 +154,179 @@
 
         .prize-popup img {
             width: 100%;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .prize-title {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a365d;
+        }
+
+        /* 劇烈搖晃動畫 */
+        @keyframes shake {
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            10% { transform: translate(-3px, -2px) rotate(-3deg); }
+            20% { transform: translate(-4px, 0px) rotate(3deg); }
+            30% { transform: translate(3px, 3px) rotate(0deg); }
+            40% { transform: translate(2px, -2px) rotate(3deg); }
+            50% { transform: translate(-2px, 3px) rotate(-3deg); }
+            60% { transform: translate(-4px, 2px) rotate(0deg); }
+            70% { transform: translate(3px, 2px) rotate(-3deg); }
+            80% { transform: translate(-2px, -2px) rotate(3deg); }
+            90% { transform: translate(3px, 3px) rotate(0deg); }
+            100% { transform: translate(2px, -2px) rotate(0deg); }
+        }
+        .shaking {
+            animation: shake 0.25s infinite;
+            pointer-events: none;
+        }
+
+        /* 按鈕樣式 */
+        .btn {
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 6px 18px rgba(56, 161, 105, 0.4);
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(56, 161, 105, 0.5);
+        }
+        .btn:active {
+            transform: translateY(1px);
+        }
+        .btn:disabled {
+            background: #cbd5e0 !important;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* 抽獎結果文字 */
+        #result {
+            margin-top: 25px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2b6cb0;
+            min-height: 40px;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <!-- 使用線上佔位圖片取代本地檔案 -->
+        <div class="school-header">
+            <img src="https://via.placeholder.com/70x70/1a365d/ffffff?text=Badge" alt="School Badge" class="school-badge">
+            <div class="school-name">
+                <div class="school-name-en">St. Stephen’s Girls’ College</div>
+                <div class="school-name-zh">聖士提反女子中學</div>
+            </div>
+        </div>
+
+        <h1 class="main-title">120<sup>th</sup> Anniversary Open Day 一百二十周年校慶開放日</h1>
+
+        <div class="box-title">🎁 幸運盲盒 Fortune Mystery Box 🎁</div>
+        <div class="subtitle">點擊盲盒或按下開盒按鈕 Click box or button to open</div>
+    </div>
+
+    <!-- 盲盒主體 -->
+    <div class="box-container" id="boxContainer" onclick="openBox()">
+        <div class="box" id="blindBox">
+            <img src="https://via.placeholder.com/200x200/f6ad55/ffffff?text=120+Logo" alt="120 Logo" class="box-logo">
+        </div>
+        
+        <!-- Pop-Up 彈出圖片層 -->
+        <div class="prize-popup" id="prizePopup">
+            <img id="popupImg" src="https://via.placeholder.com/200x200/f6ad55/ffffff?text=Prize" alt="Prize Graphic">
+            <div class="prize-title" id="popupTitle"></div>
+        </div>
+    </div>
+
+    <button class="btn" id="drawBtn" onclick="openBox()">隨機開盒 Open Box</button>
+
+    <div id="result"></div>
+
+    <script>
+        // 替換為佔位圖片以確保介面能顯示
+        const prizes = [
+            { name: "Summer Uniform Clip", weight: 10, image: "https://via.placeholder.com/280x200/48bb78/ffffff?text=Summer+Clip" },
+            { name: "Winter Uniform Clip", weight: 10, image: "https://via.placeholder.com/280x200/4299e1/ffffff?text=Winter+Clip" },
+            { name: "Magnet", weight: 10, image: "https://via.placeholder.com/280x200/ed8936/ffffff?text=Magnet" },
+            { name: "Bookmark", weight: 20, image: "https://via.placeholder.com/280x200/9f7aea/ffffff?text=Bookmark" },
+            { name: "Card holder", weight: 50, image: "https://via.placeholder.com/280x200/f56565/ffffff?text=Card+Holder" }
+        ];
+
+        let isDrawing = false;
+        
+        const box = document.getElementById('blindBox');
+        const drawBtn = document.getElementById('drawBtn');
+        const resultDiv = document.getElementById('result');
+        const prizePopup = document.getElementById('prizePopup');
+        const popupImg = document.getElementById('popupImg');
+        const popupTitle = document.getElementById('popupTitle');
+
+        function openBox() {
+            if (isDrawing) return;
+            isDrawing = true;
+            
+            prizePopup.classList.remove('active');
+            
+            drawBtn.disabled = true;
+            resultDiv.innerHTML = "抽獎中... Opening...";
+            
+            box.classList.add('shaking');
+
+            setTimeout(() => {
+                box.classList.remove('shaking');
+                const wonPrize = drawPrize();
+                showResult(wonPrize);
+            }, 1500);
+        }
+
+        function drawPrize() {
+            const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
+            let randomNum = Math.random() * totalWeight;
+            
+            for (let prize of prizes) {
+                if (randomNum < prize.weight) {
+                    return prize;
+                }
+                randomNum -= prize.weight;
+            }
+            return prizes[prizes.length - 1]; 
+        }
+
+        function showResult(prize) {
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#1a365d', '#2b6cb0', '#f6ad55', '#e2e8f0']
+            });
+
+            popupImg.src = prize.image;
+            popupTitle.textContent = prize.name;
+            
+            prizePopup.classList.add('active');
+
+            resultDiv.innerHTML = `🎉 恭喜獲得 / Congratulations, you won: <br><span style="color: #e53e3e; font-size: 26px;">${prize.name}</span> 🎉`;
+            
+            isDrawing = false;
+            drawBtn.disabled = false;
+            drawBtn.textContent = "再次開盒 Play Again";
+        }
+    </script>
+</body>
+</html>
