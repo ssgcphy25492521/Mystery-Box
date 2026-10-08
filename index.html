@@ -26,36 +26,37 @@
             padding: 0 15px;
         }
 
-        /* 校徽與校名 (並排版面) */
+        /* 校徽與校名 (居中排版) */
         .school-header {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 10px;
         }
 
         .school-badge {
-            height: 65px;
+            height: 70px;
             width: auto;
             object-fit: contain;
         }
 
         .school-name {
-            text-align: left;
+            text-align: center;
             color: #1a365d;
         }
 
         .school-name-en {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
-            line-height: 1.2;
+            line-height: 1.25;
         }
 
         .school-name-zh {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
-            line-height: 1.2;
+            line-height: 1.25;
         }
 
         /* 大會主題 */
@@ -63,7 +64,7 @@
             color: #1a365d;
             font-size: 24px;
             font-weight: bold;
-            margin: 8px 0 4px 0;
+            margin: 12px 0 6px 0;
         }
 
         .main-title sup {
@@ -104,17 +105,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
-            font-size: 50px;
-            font-weight: bold;
             box-shadow: 0 15px 30px rgba(30, 60, 114, 0.4);
             transition: transform 0.3s, box-shadow 0.3s;
             position: relative;
             z-index: 2;
+            overflow: hidden;
+            padding: 15px;
+            box-sizing: border-box;
         }
         .box:hover {
             transform: scale(1.04);
             box-shadow: 0 20px 35px rgba(30, 60, 114, 0.5);
+        }
+
+        /* 盲盒內封面圖片 (取代問號) */
+        .box-logo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            pointer-events: none;
         }
 
         /* 彈出圖片 Pop-up Image Card */
@@ -216,7 +226,7 @@
 <body>
 
     <div class="header-container">
-        <!-- 1. 校徽與校名 -->
+        <!-- 1. 校徽與校名 (居中) -->
         <div class="school-header">
             <img src="School badge.png" alt="St. Stephen's Girls' College Badge" class="school-badge">
             <div class="school-name">
@@ -233,9 +243,11 @@
         <div class="subtitle">點擊盲盒或按下開盒按鈕 Click box or button to open</div>
     </div>
 
-    <!-- 盲盒主體 -->
+    <!-- 盲盒主體 (封面為 120 logo.jpg) -->
     <div class="box-container" id="boxContainer">
-        <div class="box" id="blindBox">？</div>
+        <div class="box" id="blindBox">
+            <img src="120 logo.jpg" alt="120 Logo" class="box-logo">
+        </div>
         
         <!-- Pop-Up 彈出圖片層 -->
         <div class="prize-popup" id="prizePopup">
@@ -244,4 +256,21 @@
         </div>
     </div>
 
-    <!-- 控制按
+    <!-- 控制按鈕 -->
+    <button class="btn" id="drawBtn" onclick="openBox()">隨機開盒 Open Box</button>
+
+    <!-- 結果顯示 -->
+    <div id="result"></div>
+
+    <script>
+        // 【自訂獎品與中獎機率】
+        const prizes = [
+            { name: "Summer Uniform Clip", weight: 10, image: "120 logo.jpg" },
+            { name: "Winter Uniform Clip", weight: 10, image: "120 logo.jpg" },
+            { name: "Magnet", weight: 10, image: "120 logo.jpg" },
+            { name: "bookmark", weight: 20, image: "120 logo.jpg" },
+            { name: "Card holder", weight: 50, image: "120 logo.jpg" }
+        ];
+
+        let isDrawing = false;
+        let audioCtx
