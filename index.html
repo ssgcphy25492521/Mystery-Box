@@ -223,24 +223,25 @@
         <h1 class="main-title">120<sup>th</sup> Anniversary Open Day 一百二十周年校慶開放日</h1>
 
         <div class="box-title">🎁 幸運盲盒 Fortune Mystery Box 🎁</div>
-        <div class="subtitle">點擊盲盒或按下開盒按鈕 Click box or button to open</div>
-    </div>
-
-    <!-- The Box Cover remains the 120 logo -->
-    <div class="box-container" id="boxContainer" onclick="openBox()">
-        <div class="box" id="blindBox">
-            <img src="120 logo.png" alt="120 Logo" class="box-logo">
-        </div>
-        
-        <!-- The popup image that shows the souvenir -->
-        <div class="prize-popup" id="prizePopup">
-            <img id="popupImg" src="" alt="Prize Graphic">
-        </div>
-    </div>
-
-    <button class="btn" id="drawBtn" onclick="openBox()">隨機開盒 Open Box</button>
-
-    <div id="result"></div>
+        <div class="subtitle">點擊盲盒開啓 Click box to open</div>
+   </div>
+ 
+   <!-- The Box Cover remains the 120 logo -->
+   <div class="box-container" id="boxContainer" onclick="openBox()">
+       <div class="box" id="blindBox">
+           <img src="120 logo.png" alt="120 Logo" class="box-logo">
+       </div>
+       
+       <!-- The popup image that shows the souvenir -->
+       <div class="prize-popup" id="prizePopup">
+           <img id="popupImg" src="" alt="Prize Graphic">
+       </div>
+   </div>
+ 
+   <!-- Replaced the "Open" button with a hidden "Close" button -->
+   <button class="btn" id="closeBtn" onclick="closeBox()" style="display: none; margin: 20px auto;">收起盲盒 Close Box</button>
+ 
+   <div id="result"></div>
 
 <script>
    const prizes = [
@@ -252,15 +253,16 @@
    ];
  
    let isDrawing = false;
-   let audioCtx; // Global audio context
+   let isOpen = false; // Tracks if the box is currently open
+   let audioCtx; 
     
    const box = document.getElementById('blindBox');
-   const drawBtn = document.getElementById('drawBtn');
+   const closeBtn = document.getElementById('closeBtn');
    const resultDiv = document.getElementById('result');
    const prizePopup = document.getElementById('prizePopup');
    const popupImg = document.getElementById('popupImg');
 
-   // Initialize the audio engine (must happen after user clicks)
+   // Initialize the audio engine
    function initAudio() {
        if (!audioCtx) {
            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -273,7 +275,6 @@
    // Synthesize a retro "rattling/shaking" sound
    function playShakeSound() {
        initAudio();
-       // Create 12 rapid low-pitched blips to match the 1.2s shake animation
        for (let i = 0; i < 12; i++) {
            const osc = audioCtx.createOscillator();
            const gain = audioCtx.createGain();
@@ -281,7 +282,7 @@
            gain.connect(audioCtx.destination);
            
            osc.type = 'square'; 
-           osc.frequency.value = 80 + (Math.random() * 40); // Low, random pitch
+           osc.frequency.value = 80 + (Math.random() * 40); 
            
            const startTime = audioCtx.currentTime + (i * 0.1);
            gain.gain.setValueAtTime(0.05, startTime);
@@ -295,7 +296,6 @@
    // Synthesize an ascending "Tada!" chord
    function playWinSound() {
        initAudio();
-       // Notes for a winning arpeggio (C4, E4, G4, C5)
        const notes = [261.63, 329.63, 392.00, 523.25];
        const now = audioCtx.currentTime;
        
@@ -308,11 +308,10 @@
            osc.type = 'sine';
            osc.frequency.value = freq;
            
-           const startTime = now + (i * 0.1); // Stagger the notes
+           const startTime = now + (i * 0.1); 
            gain.gain.setValueAtTime(0, startTime);
            gain.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
            
-           // Hold the final note longer
            const duration = (i === notes.length - 1) ? 1.5 : 0.2; 
            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
            
@@ -322,19 +321,14 @@
    }
  
    function openBox() {
-       if (isDrawing) return;
+       // Prevent clicking if it's already shaking OR already open
+       if (isDrawing || isOpen) return;
        isDrawing = true;
        
-       // Close previous popup
-       prizePopup.classList.remove('active');
-       
-       drawBtn.disabled = true;
        resultDiv.style.color = "#2b6cb0"; 
        resultDiv.innerHTML = "抽獎中... Opening...";
        
        box.classList.add('shaking');
-
-       // Play synthesized shaking sound
        playShakeSound();
  
        const wonPrize = drawPrize();
@@ -363,7 +357,6 @@
     }
  
    function showResult(prize) {
-       // Play synthesized winning sound
        playWinSound();
 
        confetti({
@@ -376,12 +369,25 @@
        prizePopup.classList.add('active');
  
        resultDiv.style.color = "#e53e3e";
-       resultDiv.innerHTML = `🎉 恭喜獲得 / Congratulations! 🎉`;
+       resultDiv.innerHTML = `🎉 恭喜獲得 Congratulations! 🎉`;
        
        isDrawing = false;
-       drawBtn.disabled = false;
-       drawBtn.textContent = "再次開盒 Play Again";
+       isOpen = true; // Mark the box as open
+       closeBtn.style.display = 'inline-block'; // Show the close button
     }
+
+   // New function to close the box and reset for the next player
+   function closeBox() {
+       prizePopup.classList.remove('active');
+       closeBtn.style.display = 'none'; // Hide the button again
+       
+       // Add a slight delay before resetting text so the popup animation finishes cleanly
+       setTimeout(() => {
+           resultDiv.innerHTML = "點擊盲盒繼續 Click box to play again";
+           resultDiv.style.color = "#4a5568";
+           isOpen = false; // Allow the box to be clicked again
+       }, 300);
+   }
 </script>
 </body>
 </html>
