@@ -147,14 +147,14 @@
         }
 
         .prize-popup img {
-            width: 100%;
-            height: auto;
-            min-height: 150px;
-            border-radius: 10px;
-            display: block;
-            object-fit: contain;
-        }
-
+    max-width: 100%;     /* Prevents image from overflowing the sides */
+    max-height: 220px;   /* Limits how tall the image can get */
+    height: auto;
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto;      /* Centers the image inside the popup */
+    object-fit: contain;
+}
         @keyframes shake {
             0% { transform: translate(2px, 2px) rotate(0deg); }
             10% { transform: translate(-3px, -2px) rotate(-3deg); }
