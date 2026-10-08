@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎁 120周年校慶開放日 幸運盲盒 🎁</title>
+    <title>🎁 St. Stephen's Girls' College - 120th Anniversary Open Day Fortune Mystery Box 🎁</title>
     <!-- Canvas-Confetti 絲帶與彩帶特效庫 -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     
@@ -12,23 +12,82 @@
             font-family: 'Helvetica Neue', Arial, sans-serif;
             text-align: center;
             background: #f0f2f5;
-            padding-top: 40px;
+            padding-top: 30px;
             margin: 0;
             overflow-x: hidden;
         }
-        h1 {
-            color: #1a365d;
-            margin-bottom: 5px;
+
+        /* 頂部校名與標題容器 */
+        .header-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
         }
+
+        /* 校徽與校名 (並排版面) */
+        .school-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .school-badge {
+            height: 65px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .school-name {
+            text-align: left;
+            color: #1a365d;
+        }
+
+        .school-name-en {
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .school-name-zh {
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        /* 大會主題 */
+        .main-title {
+            color: #1a365d;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 8px 0 4px 0;
+        }
+
+        .main-title sup {
+            font-size: 0.65em;
+            vertical-align: super;
+        }
+
+        /* 活動名稱 */
+        .box-title {
+            color: #2b6cb0;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
         .subtitle {
             color: #4a5568;
-            font-size: 16px;
-            margin-bottom: 25px;
+            font-size: 15px;
+            margin-bottom: 15px;
         }
         
         /* 盲盒容器 */
         .box-container {
-            margin: 40px auto 20px auto;
+            margin: 30px auto 20px auto;
             width: 220px;
             height: 220px;
             cursor: pointer;
@@ -106,236 +165,4 @@
             40% { transform: translate(2px, -2px) rotate(3deg); }
             50% { transform: translate(-2px, 3px) rotate(-3deg); }
             60% { transform: translate(-4px, 2px) rotate(0deg); }
-            70% { transform: translate(3px, 2px) rotate(-3deg); }
-            80% { transform: translate(-2px, -2px) rotate(3deg); }
-            90% { transform: translate(3px, 3px) rotate(0deg); }
-            100% { transform: translate(2px, -2px) rotate(0deg); }
-        }
-        .shaking {
-            animation: shake 0.25s infinite;
-            pointer-events: none;
-        }
-
-        /* 按鈕樣式 */
-        .btn {
-            padding: 14px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            margin-top: 25px;
-            box-shadow: 0 6px 18px rgba(56, 161, 105, 0.4);
-            transition: all 0.2s;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(56, 161, 105, 0.5);
-        }
-        .btn:active {
-            transform: translateY(1px);
-        }
-        .btn:disabled {
-            background: #cbd5e0 !important;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        /* 抽獎結果文字 */
-        #result {
-            margin-top: 25px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #2b6cb0;
-            min-height: 40px;
-            padding: 0 20px;
-        }
-    </style>
-</head>
-<body>
-
-    <h1>🎁 120周年校慶開放日 幸運盲盒 🎁</h1>
-    <div class="subtitle">點擊盲盒或按下開盒按鈕</div>
-
-    <!-- 盲盒主體 -->
-    <div class="box-container" id="boxContainer">
-        <div class="box" id="blindBox">？</div>
-        
-        <!-- Pop-Up 彈出圖片層 -->
-        <div class="prize-popup" id="prizePopup">
-            <img id="popupImg" src="120 logo.jpg" alt="120th Anniversary Graphic">
-            <div class="prize-title" id="popupTitle"></div>
-        </div>
-    </div>
-
-    <!-- 控制按鈕 -->
-    <button class="btn" id="drawBtn" onclick="openBox()">隨機開盒</button>
-
-    <!-- 結果顯示 -->
-    <div id="result"></div>
-
-    <script>
-        // 【自訂獎品與中獎機率】（各獎品皆可自訂圖片路徑，預設帶入 '120 logo.jpg'）
-        const prizes = [
-            { name: "Summer Uniform Clip", weight: 10, image: "120 logo.jpg" },
-            { name: "Winter Uniform Clip", weight: 10, image: "120 logo.jpg" },
-            { name: "Magnet", weight: 10, image: "120 logo.jpg" },
-            { name: "bookmark", weight: 20, image: "120 logo.jpg" },
-            { name: "Card holder", weight: 50, image: "120 logo.jpg" }
-        ];
-
-        let isDrawing = false;
-        let audioCtx = null;
-
-        // 🔊 搖晃音效 (使用原生 Web Audio API 動態合成木質喀嗒搖晃聲，無需外連音訊檔)
-        function playShakeSound() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            const duration = 0.12;
-            const bufferSize = audioCtx.sampleRate * duration;
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-
-            const noise = audioCtx.createBufferSource();
-            noise.buffer = buffer;
-
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'bandpass';
-            filter.frequency.value = 750 + Math.random() * 350;
-            filter.Q.value = 3;
-
-            const gain = audioCtx.createGain();
-            gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-
-            noise.connect(filter);
-            filter.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            noise.start();
-        }
-
-        // 🎵 中獎勝利音效
-        function playWinSound() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
-            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 弦樂上升
-            notes.forEach((freq, index) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + index * 0.1);
-                
-                gain.gain.setValueAtTime(0, audioCtx.currentTime + index * 0.1);
-                gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + index * 0.1 + 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + index * 0.1 + 0.5);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                osc.start(audioCtx.currentTime + index * 0.1);
-                osc.stop(audioCtx.currentTime + index * 0.1 + 0.5);
-            });
-        }
-
-        function openBox() {
-            if (isDrawing) return;
-            isDrawing = true;
-
-            const box = document.getElementById('blindBox');
-            const resultDiv = document.getElementById('result');
-            const btn = document.getElementById('drawBtn');
-            const prizePopup = document.getElementById('prizePopup');
-            const popupImg = document.getElementById('popupImg');
-            const popupTitle = document.getElementById('popupTitle');
-
-            // 隱藏前一次的 Pop-up 圖片
-            prizePopup.classList.remove('active');
-
-            // 初始化頁面與按鈕狀態
-            resultDiv.innerText = "正在開盒中，請稍候...";
-            resultDiv.style.color = "#7f8c8d";
-            box.classList.add('shaking');
-            btn.innerText = "抽獎中...";
-            btn.disabled = true;
-
-            // 🔊 搖晃期間每 160ms 播放一次搖晃音效
-            const shakeInterval = setInterval(() => {
-                playShakeSound();
-            }, 160);
-
-            // 3 秒後開啟盲盒
-            setTimeout(() => {
-                clearInterval(shakeInterval);
-                box.classList.remove('shaking');
-
-                // 權重隨機演算法
-                const totalWeight = prizes.reduce((sum, p) => sum + p.weight, 0);
-                let randomNum = Math.random() * totalWeight;
-                let drawnPrize = prizes[0];
-
-                for (const prize of prizes) {
-                    if (randomNum < prize.weight) {
-                        drawnPrize = prize;
-                        break;
-                    }
-                    randomNum -= prize.weight;
-                }
-
-                // 播放勝出音效
-                playWinSound();
-
-                // 🖼️ 彈出圖片與標題特效 (Pop-up Reveal)
-                popupImg.src = drawnPrize.image || '120 logo.jpg';
-                popupTitle.innerText = drawnPrize.name;
-                prizePopup.classList.add('active');
-
-                // 🎉 噴發雙側噴射彩帶與絲帶特效
-                const duration = 2 * 1000;
-                const end = Date.now() + duration;
-
-                (function frame() {
-                    confetti({
-                        particleCount: 4,
-                        angle: 60,
-                        spread: 60,
-                        origin: { x: 0.1, y: 0.8 },
-                        colors: ['#1e3c72', '#f6ad55', '#4299e1', '#e53e3e']
-                    });
-                    confetti({
-                        particleCount: 4,
-                        angle: 120,
-                        spread: 60,
-                        origin: { x: 0.9, y: 0.8 },
-                        colors: ['#1e3c72', '#f6ad55', '#4299e1', '#e53e3e']
-                    });
-
-                    if (Date.now() < end) {
-                        requestAnimationFrame(frame);
-                    }
-                }());
-
-                // 更新結果文字
-                resultDiv.innerText = `🎉 恭喜你抽中：${drawnPrize.name} 🎉`;
-                resultDiv.style.color = "#1e3c72";
-
-                // 還原按鈕狀態
-                btn.innerText = "隨機開盒";
-                btn.disabled = false;
-                isDrawing = false;
-            }, 3000);
-        }
-
-        // 點擊盲盒區域亦可觸發抽獎
-        document.getElementById('boxContainer').addEventListener('click', openBox);
-    </script>
-</body>
-</html>
+            70% { transform:
