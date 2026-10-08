@@ -375,16 +375,14 @@
        isOpen = true; // Mark the box as open
        closeBtn.style.display = 'inline-block'; // Show the close button
     }
-
-   // New function to close the box and reset for the next player
+// Function to close the box and reset for the next player
    function closeBox() {
        prizePopup.classList.remove('active');
        closeBtn.style.display = 'none'; // Hide the button again
        
-       // Add a slight delay before resetting text so the popup animation finishes cleanly
+       // Clear the result text after the popup shrinks
        setTimeout(() => {
-           resultDiv.innerHTML = "點擊盲盒繼續 Click box to play again";
-           resultDiv.style.color = "#4a5568";
+           resultDiv.innerHTML = ""; // Clears the text completely
            isOpen = false; // Allow the box to be clicked again
        }, 300);
    }
