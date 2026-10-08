@@ -165,4 +165,83 @@
             40% { transform: translate(2px, -2px) rotate(3deg); }
             50% { transform: translate(-2px, 3px) rotate(-3deg); }
             60% { transform: translate(-4px, 2px) rotate(0deg); }
-            70% { transform:
+            70% { transform: translate(3px, 2px) rotate(-3deg); }
+            80% { transform: translate(-2px, -2px) rotate(3deg); }
+            90% { transform: translate(3px, 3px) rotate(0deg); }
+            100% { transform: translate(2px, -2px) rotate(0deg); }
+        }
+        .shaking {
+            animation: shake 0.25s infinite;
+            pointer-events: none;
+        }
+
+        /* 按鈕樣式 */
+        .btn {
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 6px 18px rgba(56, 161, 105, 0.4);
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(56, 161, 105, 0.5);
+        }
+        .btn:active {
+            transform: translateY(1px);
+        }
+        .btn:disabled {
+            background: #cbd5e0 !important;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* 抽獎結果文字 */
+        #result {
+            margin-top: 25px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2b6cb0;
+            min-height: 40px;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <!-- 1. 校徽與校名 -->
+        <div class="school-header">
+            <img src="School badge.png" alt="St. Stephen's Girls' College Badge" class="school-badge">
+            <div class="school-name">
+                <div class="school-name-en">St. Stephen’s Girls’ College</div>
+                <div class="school-name-zh">聖士提反女子中學</div>
+            </div>
+        </div>
+
+        <!-- 2. 周年主題標題 (th 為 上標 superscript) -->
+        <h1 class="main-title">120<sup>th</sup> Anniversary Open Day 一百二十周年校慶開放日</h1>
+
+        <!-- 3. 活動盲盒主題 -->
+        <div class="box-title">🎁 幸運盲盒 Fortune Mystery Box 🎁</div>
+        <div class="subtitle">點擊盲盒或按下開盒按鈕 Click box or button to open</div>
+    </div>
+
+    <!-- 盲盒主體 -->
+    <div class="box-container" id="boxContainer">
+        <div class="box" id="blindBox">？</div>
+        
+        <!-- Pop-Up 彈出圖片層 -->
+        <div class="prize-popup" id="prizePopup">
+            <img id="popupImg" src="120 logo.jpg" alt="120th Anniversary Graphic">
+            <div class="prize-title" id="popupTitle"></div>
+        </div>
+    </div>
+
+    <!-- 控制按
