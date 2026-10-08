@@ -139,6 +139,10 @@
             border-radius: 16px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             border: 3px solid #f6ad55;
+            /* Added flex to keep the contained image perfectly centered */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .prize-popup.active {
@@ -147,12 +151,15 @@
         }
 
         .prize-popup img {
-            width: 100%;
+            /* Changed to prevent large images from overflowing the screen */
+            max-width: 100%;
+            max-height: 40vh; /* Limits image height to 40% of the screen */
+            width: auto;
             height: auto;
-            min-height: 150px;
             border-radius: 10px;
             display: block;
             object-fit: contain;
+            margin: 0 auto;
         }
 
         @keyframes shake {
@@ -201,9 +208,9 @@
 
         #result {
             margin-top: 25px;
-            font-size: 24px; /* Slightly larger text for emphasis */
+            font-size: 24px;
             font-weight: bold;
-            color: #e53e3e; /* Changed to an exciting red/orange color */
+            color: #e53e3e;
             min-height: 40px;
             padding: 0 20px;
         }
@@ -243,8 +250,6 @@
     <div id="result"></div>
 
     <script>
-        // Updated to use the 4 souvenir image files. 
-        // Adjust the 'weight' to make certain souvenirs more rare (higher number = more common).
         const prizes = [
             { image: "S1.png", weight: 25 },
             { image: "S2.png", weight: 25 },
@@ -314,5 +319,3 @@
             drawBtn.textContent = "再次開盒 Play Again";
         }
     </script>
-</body>
-</html>
