@@ -85,8 +85,8 @@
         
         .box-container {
             margin: 30px auto 20px auto;
-            width: 280px;  /* Changed from 220px */
-            height: 280px; /* Changed from 220px */
+            width: 300px;  /* Changed from 220px */
+            height: 300px; /* Changed from 220px */
             cursor: pointer;
             position: relative;
         }
@@ -116,8 +116,8 @@
         .box-logo {
             max-width: 100%;
             max-height: 100%;
-            min-width: 140px; /* Increased from 100px */
-            min-height: 140px; /* Increased from 100px */
+            min-width: 200px; /* Increased from 100px */
+            min-height: 200px; /* Increased from 100px */
             object-fit: contain;
             border-radius: 12px;
             pointer-events: none;
@@ -376,14 +376,14 @@
        closeBtn.style.display = 'inline-block'; // Show the close button
     }
 // Function to close the box and reset for the next player
-   function closeBox() {
+    function closeBox() {
        prizePopup.classList.remove('active');
-       closeBtn.style.display = 'none'; // Hide the button again
+       closeBtn.style.display = 'none'; 
+       resultDiv.innerHTML = ""; // Clears the congratulations text immediately
        
-       // Clear the result text after the popup shrinks
+       // Brief delay before allowing another click so the shrink animation finishes
        setTimeout(() => {
-           resultDiv.innerHTML = ""; // Clears the text completely
-           isOpen = false; // Allow the box to be clicked again
+           isOpen = false; 
        }, 300);
    }
 </script>
