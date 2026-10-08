@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎁 St. Stephen's Girls' College - 120th Anniversary Open Day Fortune Mystery Box 🎁</title>
-    <!-- Canvas-Confetti 絲帶與彩帶特效庫 -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     
     <style>
@@ -17,7 +16,6 @@
             overflow-x: hidden;
         }
 
-        /* 頂部校名與標題容器 */
         .header-container {
             display: flex;
             flex-direction: column;
@@ -26,7 +24,6 @@
             padding: 0 15px;
         }
 
-        /* 校徽與校名 (居中排版) */
         .school-header {
             display: flex;
             flex-direction: column;
@@ -36,10 +33,13 @@
             margin-bottom: 10px;
         }
 
+        /* Added fallback background in case image is missing */
         .school-badge {
             height: 70px;
-            width: auto;
+            width: 70px;
             object-fit: contain;
+            background-color: #e2e8f0; 
+            border-radius: 50%;
         }
 
         .school-name {
@@ -59,7 +59,6 @@
             line-height: 1.25;
         }
 
-        /* 大會主題 */
         .main-title {
             color: #1a365d;
             font-size: 24px;
@@ -72,7 +71,6 @@
             vertical-align: super;
         }
 
-        /* 活動名稱 */
         .box-title {
             color: #2b6cb0;
             font-size: 22px;
@@ -86,7 +84,6 @@
             margin-bottom: 15px;
         }
         
-        /* 盲盒容器 */
         .box-container {
             margin: 30px auto 20px auto;
             width: 220px;
@@ -95,7 +92,6 @@
             position: relative;
         }
         
-        /* 盲盒本體 */
         .box {
             width: 100%;
             height: 100%;
@@ -118,16 +114,18 @@
             box-shadow: 0 20px 35px rgba(30, 60, 114, 0.5);
         }
 
-        /* 盲盒內封面圖片 */
+        /* Added min-height so the box doesn't collapse if image is missing */
         .box-logo {
             max-width: 100%;
             max-height: 100%;
+            min-width: 100px;
+            min-height: 100px;
             object-fit: contain;
             border-radius: 12px;
             pointer-events: none;
+            background-color: rgba(255,255,255,0.2); 
         }
 
-        /* 彈出圖片 Pop-up Image Card */
         .prize-popup {
             position: absolute;
             top: 50%;
@@ -146,7 +144,6 @@
             border: 3px solid #f6ad55;
         }
 
-        /* 盲盒打開後 Pop-up 浮出放大效果 */
         .prize-popup.active {
             transform: translate(-50%, -105%) scale(1.05);
             opacity: 1;
@@ -155,8 +152,10 @@
         .prize-popup img {
             width: 100%;
             height: auto;
+            min-height: 150px;
             border-radius: 10px;
             display: block;
+            background-color: #f0f2f5;
         }
 
         .prize-title {
@@ -166,7 +165,6 @@
             color: #1a365d;
         }
 
-        /* 劇烈搖晃動畫 */
         @keyframes shake {
             0% { transform: translate(2px, 2px) rotate(0deg); }
             10% { transform: translate(-3px, -2px) rotate(-3deg); }
@@ -185,7 +183,6 @@
             pointer-events: none;
         }
 
-        /* 按鈕樣式 */
         .btn {
             padding: 14px 40px;
             font-size: 18px;
@@ -212,7 +209,6 @@
             cursor: not-allowed;
         }
 
-        /* 抽獎結果文字 */
         #result {
             margin-top: 25px;
             font-size: 22px;
@@ -226,9 +222,9 @@
 <body>
 
     <div class="header-container">
-        <!-- 使用線上佔位圖片取代本地檔案 -->
+        <!-- Your original school badge file name -->
         <div class="school-header">
-            <img src="https://via.placeholder.com/70x70/1a365d/ffffff?text=Badge" alt="School Badge" class="school-badge">
+            <img src="School badge.png" alt="School Badge" class="school-badge">
             <div class="school-name">
                 <div class="school-name-en">St. Stephen’s Girls’ College</div>
                 <div class="school-name-zh">聖士提反女子中學</div>
@@ -241,15 +237,14 @@
         <div class="subtitle">點擊盲盒或按下開盒按鈕 Click box or button to open</div>
     </div>
 
-    <!-- 盲盒主體 -->
+    <!-- Your original 120 logo file name -->
     <div class="box-container" id="boxContainer" onclick="openBox()">
         <div class="box" id="blindBox">
-            <img src="https://via.placeholder.com/200x200/f6ad55/ffffff?text=120+Logo" alt="120 Logo" class="box-logo">
+            <img src="120 logo.jpg" alt="120 Logo" class="box-logo">
         </div>
         
-        <!-- Pop-Up 彈出圖片層 -->
         <div class="prize-popup" id="prizePopup">
-            <img id="popupImg" src="https://via.placeholder.com/200x200/f6ad55/ffffff?text=Prize" alt="Prize Graphic">
+            <img id="popupImg" src="120 logo.jpg" alt="Prize Graphic">
             <div class="prize-title" id="popupTitle"></div>
         </div>
     </div>
@@ -259,13 +254,13 @@
     <div id="result"></div>
 
     <script>
-        // 替換為佔位圖片以確保介面能顯示
+        // Restored your original local file images for the prizes
         const prizes = [
-            { name: "Summer Uniform Clip", weight: 10, image: "https://via.placeholder.com/280x200/48bb78/ffffff?text=Summer+Clip" },
-            { name: "Winter Uniform Clip", weight: 10, image: "https://via.placeholder.com/280x200/4299e1/ffffff?text=Winter+Clip" },
-            { name: "Magnet", weight: 10, image: "https://via.placeholder.com/280x200/ed8936/ffffff?text=Magnet" },
-            { name: "Bookmark", weight: 20, image: "https://via.placeholder.com/280x200/9f7aea/ffffff?text=Bookmark" },
-            { name: "Card holder", weight: 50, image: "https://via.placeholder.com/280x200/f56565/ffffff?text=Card+Holder" }
+            { name: "Summer Uniform Clip", weight: 10, image: "120 logo.jpg" },
+            { name: "Winter Uniform Clip", weight: 10, image: "120 logo.jpg" },
+            { name: "Magnet", weight: 10, image: "120 logo.jpg" },
+            { name: "Bookmark", weight: 20, image: "120 logo.jpg" },
+            { name: "Card holder", weight: 50, image: "120 logo.jpg" }
         ];
 
         let isDrawing = false;
