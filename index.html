@@ -243,80 +243,144 @@
     <div id="result"></div>
 
 <script>
-    const prizes = [
-        { image: "S1.png", weight: 0 },
-        { image: "S2.png", weight: 0 },
-        { image: "S3.png", weight: 0 },
-        { image: "S4.png", weight: 0 },
-        { image: "S5.png", weight: 100 }
-    ];
-
-    let isDrawing = false;
+   const prizes = [
+       { image: "S1.png", weight: 0 },
+       { image: "S2.png", weight: 0 },
+       { image: "S3.png", weight: 0 },
+       { image: "S4.png", weight: 0 },
+       { image: "S5.png", weight: 100 }
+   ];
+ 
+   let isDrawing = false;
+   let audioCtx; // Global audio context
     
-    const box = document.getElementById('blindBox');
-    const drawBtn = document.getElementById('drawBtn');
-    const resultDiv = document.getElementById('result');
-    const prizePopup = document.getElementById('prizePopup');
-    const popupImg = document.getElementById('popupImg');
+   const box = document.getElementById('blindBox');
+   const drawBtn = document.getElementById('drawBtn');
+   const resultDiv = document.getElementById('result');
+   const prizePopup = document.getElementById('prizePopup');
+   const popupImg = document.getElementById('popupImg');
 
-    function openBox() {
-        if (isDrawing) return;
-        isDrawing = true;
-        
-        // 1. Close previous popup
-        prizePopup.classList.remove('active');
-        
-        drawBtn.disabled = true;
-        resultDiv.style.color = "#2b6cb0"; 
-        resultDiv.innerHTML = "抽獎中... Opening...";
-        
-        box.classList.add('shaking');
+   // Initialize the audio engine (must happen after user clicks)
+   function initAudio() {
+       if (!audioCtx) {
+           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+       }
+       if (audioCtx.state === 'suspended') {
+           audioCtx.resume();
+       }
+   }
 
-        // 2. Pick the prize immediately
-        const wonPrize = drawPrize();
+   // Synthesize a retro "rattling/shaking" sound
+   function playShakeSound() {
+       initAudio();
+       // Create 12 rapid low-pitched blips to match the 1.2s shake animation
+       for (let i = 0; i < 12; i++) {
+           const osc = audioCtx.createOscillator();
+           const gain = audioCtx.createGain();
+           osc.connect(gain);
+           gain.connect(audioCtx.destination);
+           
+           osc.type = 'square'; 
+           osc.frequency.value = 80 + (Math.random() * 40); // Low, random pitch
+           
+           const startTime = audioCtx.currentTime + (i * 0.1);
+           gain.gain.setValueAtTime(0.05, startTime);
+           gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.08);
+           
+           osc.start(startTime);
+           osc.stop(startTime + 0.1);
+       }
+   }
 
-        // 3. Swap the image invisibly mid-shake after old popup shrinks
-        setTimeout(() => {
-            popupImg.src = wonPrize.image;
-        }, 400);
+   // Synthesize an ascending "Tada!" chord
+   function playWinSound() {
+       initAudio();
+       // Notes for a winning arpeggio (C4, E4, G4, C5)
+       const notes = [261.63, 329.63, 392.00, 523.25];
+       const now = audioCtx.currentTime;
+       
+       notes.forEach((freq, i) => {
+           const osc = audioCtx.createOscillator();
+           const gain = audioCtx.createGain();
+           osc.connect(gain);
+           gain.connect(audioCtx.destination);
+           
+           osc.type = 'sine';
+           osc.frequency.value = freq;
+           
+           const startTime = now + (i * 0.1); // Stagger the notes
+           gain.gain.setValueAtTime(0, startTime);
+           gain.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
+           
+           // Hold the final note longer
+           const duration = (i === notes.length - 1) ? 1.5 : 0.2; 
+           gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+           
+           osc.start(startTime);
+           osc.stop(startTime + duration);
+       });
+   }
+ 
+   function openBox() {
+       if (isDrawing) return;
+       isDrawing = true;
+       
+       // Close previous popup
+       prizePopup.classList.remove('active');
+       
+       drawBtn.disabled = true;
+       resultDiv.style.color = "#2b6cb0"; 
+       resultDiv.innerHTML = "抽獎中... Opening...";
+       
+       box.classList.add('shaking');
 
-        // 4. Reveal the new prize when shaking finishes
-        setTimeout(() => {
-            box.classList.remove('shaking');
-            showResult(wonPrize);
-        }, 1200);// <-- Change this number!
+       // Play synthesized shaking sound
+       playShakeSound();
+ 
+       const wonPrize = drawPrize();
+ 
+       setTimeout(() => {
+           popupImg.src = wonPrize.image;
+       }, 400);
+ 
+       setTimeout(() => {
+           box.classList.remove('shaking');
+           showResult(wonPrize);
+       }, 1200); 
     }
-
-    function drawPrize() {
-        const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
-        let randomNum = Math.random() * totalWeight;
-        
-        for (let prize of prizes) {
-            if (randomNum < prize.weight) {
+ 
+   function drawPrize() {
+       const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
+       let randomNum = Math.random() * totalWeight;
+       
+       for (let prize of prizes) {
+           if (randomNum < prize.weight) {
                 return prize;
-            }
-            randomNum -= prize.weight;
-        }
-        return prizes[prizes.length - 1]; 
+           }
+           randomNum -= prize.weight;
+       }
+       return prizes[prizes.length - 1]; 
     }
+ 
+   function showResult(prize) {
+       // Play synthesized winning sound
+       playWinSound();
 
-    function showResult(prize) {
-        confetti({
-            particleCount: 150,
-            spread: 80,
-            origin: { y: 0.6 },
-            colors: ['#1a365d', '#2b6cb0', '#f6ad55', '#e2e8f0']
-        });
-        
-        // Popup opens smoothly with the pre-loaded image
-        prizePopup.classList.add('active');
-
-        resultDiv.style.color = "#e53e3e";
-        resultDiv.innerHTML = `🎉 恭喜獲得 / Congratulations! 🎉`;
-        
-        isDrawing = false;
-        drawBtn.disabled = false;
-        drawBtn.textContent = "再次開盒 Play Again";
+       confetti({
+           particleCount: 150,
+           spread: 80,
+           origin: { y: 0.6 },
+           colors: ['#1a365d', '#2b6cb0', '#f6ad55', '#e2e8f0']
+       });
+       
+       prizePopup.classList.add('active');
+ 
+       resultDiv.style.color = "#e53e3e";
+       resultDiv.innerHTML = `🎉 恭喜獲得 / Congratulations! 🎉`;
+       
+       isDrawing = false;
+       drawBtn.disabled = false;
+       drawBtn.textContent = "再次開盒 Play Again";
     }
 </script>
 </body>
