@@ -224,7 +224,7 @@
     <div>一百二十周年校慶開放日</div>
 </h1>
         <div class="box-title">🎁 幸運盲盒 Fortune Mystery Box 🎁</div>
-        <div class="subtitle">點擊盲盒開啓 Click box to open</div>
+        <div class="subtitle">點擊開啓盲盒 Click box to open</div>
    </div>
  
    <!-- The Box Cover remains the 120 logo -->
@@ -240,7 +240,7 @@
    </div>
  
    <!-- Replaced the "Open" button with a hidden "Close" button -->
-   <button class="btn" id="closeBtn" onclick="closeBox()" style="display: none; margin: 20px auto;">收起盲盒 Close Box</button>
+   <button class="btn" id="closeBtn" onclick="closeBox()" style="display: none; margin: 20px auto;">重設 Reset</button>
  
    <div id="result"></div>
 
@@ -329,7 +329,7 @@
         isDrawing = true;
         
         resultDiv.style.color = "#2b6cb0"; 
-        resultDiv.innerHTML = "抽獎中... Opening...";
+        resultDiv.innerHTML = "驚喜準備中... Opening...";
         
         box.classList.add('shaking');
         playShakeSound();
